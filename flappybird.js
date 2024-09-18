@@ -71,8 +71,8 @@ let context;
 let bg3X;
 
 //bird
-let birdWidth = 34; //width/height ratio = 408/228 = 17/12
-let birdHeight = 24;
+let birdWidth = 64; //width/height ratio = 408/228 = 17/12
+let birdHeight = 38;
 let birdX = boardWidth/8;
 let birdY = boardHeight/2;
 let birdImg;
@@ -97,7 +97,7 @@ let bottomPipeImg;
 //physics
 let velocityX = -3; //pipes moving left speed
 let velocityY = 0; //bird jump speed
-let gravity = 0.1;
+let gravity = 0.2;
 
 let gameOver = false;
 let score = 0;
@@ -130,7 +130,7 @@ window.onload = function() {
 
     //load images
     birdImg = new Image();
-    birdImg.src = "./flappybird.png";
+    birdImg.src = "./flappysuit1.png";
     birdImg.onload = function() {
         context.drawImage(birdImg, bird.x, bird.y, bird.width, bird.height);
     }
@@ -142,7 +142,7 @@ window.onload = function() {
     bottomPipeImg.src = "./assets/Cloud 7.png";
 
     requestAnimationFrame(update);
-    setInterval(placePipes, 1000); //every 1.5 seconds
+    setInterval(placePipes, 1500); //every 1.5 seconds
     document.addEventListener("keydown", moveBird);
 }
 
@@ -162,9 +162,9 @@ function update() {
     // bird.y += velocityY;
     bird.y = Math.max(bird.y + velocityY, 0); //apply gravity to current bird.y, limit the bird.y to top of the canvas
     if( velocityY <= 0) {
-        birdImg.src = "./flappybirdup.png";
+        birdImg.src = "./flappysuit2.png";
     } else {
-        birdImg.src = "./flappybird.png";
+        birdImg.src = "./flappysuit1.png";
     }
     context.drawImage(birdImg, bird.x, bird.y, bird.width, bird.height);
 
