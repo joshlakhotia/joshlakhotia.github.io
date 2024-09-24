@@ -93,6 +93,7 @@ let pipeY = 0;
 
 let topPipeImg;
 let bottomPipeImg;
+let menu;
 
 //physics
 let velocityX = -3; //pipes moving left speed
@@ -100,6 +101,7 @@ let velocityY = 0; //bird jump speed
 let gravity = 0.2;
 
 let gameOver = false;
+let gameStart = false;
 let score = 0;
 
 window.onload = function() {
@@ -131,19 +133,17 @@ window.onload = function() {
     //load images
     birdImg = new Image();
     birdImg.src = "./flappysuit1.png";
-    birdImg.onload = function() {
-        context.drawImage(birdImg, bird.x, bird.y, bird.width, bird.height);
+
+    menu = new Image();
+    menu.src = "./assets/menu.gif";
+    menu.onload = function () {
+        context.drawImage(menu, 0, 0, 1000, 640);
     }
 
-    topPipeImg = new Image();
-    topPipeImg.src = "./assets/Cloud 1.png";
-
-    bottomPipeImg = new Image();
-    bottomPipeImg.src = "./assets/Cloud 7.png";
-
     requestAnimationFrame(update);
-    setInterval(placePipes, 1500); //every 1.5 seconds
+    setInterval(placePipes, 750); //every 1 seconds
     document.addEventListener("keydown", moveBird);
+    document.addEventListener("keydown", startGame);
 }
 
 function update() {
@@ -151,59 +151,64 @@ function update() {
     if (gameOver) {
         return;
     }
-    context.clearRect(0, 0, board.width, board.height);
 
-    context.drawImage(bgImg1, 0, 0, 1000, 640);
-    context.drawImage(bgImg2, 0, 0, 1000, 640);
-    context.drawImage(bgImg3, 0, 0, 1000, 640);
+    if (gameStart) {
+        context.clearRect(0, 0, board.width, board.height);
 
-    //bird
-    velocityY += gravity/2;
-    // bird.y += velocityY;
-    bird.y = Math.max(bird.y + velocityY, 0); //apply gravity to current bird.y, limit the bird.y to top of the canvas
-    if( velocityY <= 0) {
-        birdImg.src = "./flappysuit2.png";
-    } else {
-        birdImg.src = "./flappysuit1.png";
-    }
-    context.drawImage(birdImg, bird.x, bird.y, bird.width, bird.height);
+        context.drawImage(bgImg1, 0, 0, 1000, 640);
+        context.drawImage(bgImg2, 0, 0, 1000, 640);
+        context.drawImage(bgImg3, 0, 0, 1000, 640);
 
-    if (bird.y > board.height) {
-        gameOver = true;
-    }
-
-    // if (score > 5) {       //If score is increasing, increase velocity of clouds. Only implement if clound intervals can become dynamic
-    //     velocityX = -5;
-    // }
-
-    //pipes
-    for (let i = 0; i < pipeArray.length; i++) {
-        let pipe = pipeArray[i];
-        pipe.x += velocityX;
-        context.drawImage(pipe.img, pipe.x, pipe.y, pipe.width, pipe.height);
-
-        if (!pipe.passed && bird.x > pipe.x + pipe.width) {
-            score += 1; //0.5 because there are 2 pipes! so 0.5*2 = 1, 1 for each set of pipes
-            pipe.passed = true;
+        //bird
+        velocityY += gravity/2;
+        // bird.y += velocityY;
+        bird.y = Math.max(bird.y + velocityY, 0); //apply gravity to current bird.y, limit the bird.y to top of the canvas
+        if( velocityY <= 0) {
+            birdImg.src = "./flappysuit2.png";
+        } else {
+            birdImg.src = "./flappysuit1.png";
         }
+        context.drawImage(birdImg, bird.x, bird.y, bird.width, bird.height);
 
-        if (detectCollision(bird, pipe)) {
+        if (bird.y > board.height) {
             gameOver = true;
         }
-    }
 
-    //clear pipes
-    while (pipeArray.length > 0 && pipeArray[0].x < -pipeWidth - 200) {
-        pipeArray.shift(); //removes first element from the array
-    }
+        // if (score > 5) {       //If score is increasing, increase velocity of clouds. Only implement if clound intervals can become dynamic
+        //     velocityX = -5;
+        // }
 
-    //score
-    context.fillStyle = "white";
-    context.font="45px sans-serif";
-    context.fillText(score, 5, 45);
+        //pipes
+        for (let i = 0; i < pipeArray.length; i++) {
+            let pipe = pipeArray[i];
+            pipe.x += velocityX;
+            context.drawImage(pipe.img, pipe.x, pipe.y, pipe.width, pipe.height);
 
-    if (gameOver) {
-        context.fillText("GAME OVER", 5, 90);
+            if (!pipe.passed && bird.x > pipe.x + pipe.width) {
+                score += 1; //0.5 because there are 2 pipes! so 0.5*2 = 1, 1 for each set of pipes
+                pipe.passed = true;
+            }
+
+            if (detectCollision(bird, pipe)) {
+                gameOver = true;
+            }
+        }
+
+        //clear pipes
+        while (pipeArray.length > 0 && pipeArray[0].x < -pipeWidth - 200) {
+            pipeArray.shift(); //removes first element from the array
+        }
+
+        //score
+        context.fillStyle = "white";
+        context.font="45px sans-serif";
+        context.fillText(score, 5, 45);
+
+        if (gameOver) {
+            context.drawImage(menu, 0, 0, 1000, 640);
+            context.fillText(score, 5, 45);
+            context.fillText("GAME OVER", 5, 90);
+        }
     }
 }
 
@@ -215,25 +220,36 @@ function placePipes() {
     //(0-1) * pipeHeight/2.
     // 0 -> -128 (pipeHeight/4)
     // 1 -> -128 - 256 (pipeHeight/4 - pipeHeight/2) = -3/4 pipeHeight
-    let randomPipeY = Math.random()*(640)-50;
-    let randomIndex = Math.floor(Math.random() * 10)
-    console.log(randomIndex);
-    let randomCloud = clouds[randomIndex];
-    const cloudImg = new Image;
-    cloudImg.src = randomCloud.src;
-    console.log(randomCloud);
+    if (gameStart) {
+        let randomPipeY = Math.random()*(640)-50;
+        let randomIndex = Math.floor(Math.random() * 10)
+        console.log(randomIndex);
+        let randomCloud = clouds[randomIndex];
+        const cloudImg = new Image;
+        cloudImg.src = randomCloud.src;
+        console.log(randomCloud);
 
-    let topPipe = {
-        img : cloudImg,
-        x : pipeX,
-        y : randomPipeY,
-        width : randomCloud.width,
-        height : randomCloud.height,
-        passed : false
+        let topPipe = {
+            img : cloudImg,
+            x : pipeX,
+            y : randomPipeY,
+            width : randomCloud.width,
+            height : randomCloud.height,
+            passed : false
+        }
+        pipeArray.push(topPipe);
     }
-    pipeArray.push(topPipe);
-
     
+}
+
+function startGame(e) {
+    if(e.code == "Space") {
+        gameStart = true;
+    }
+}
+
+function endGame() {
+    gameStart = false;
 }
 
 function moveBird(e) {
