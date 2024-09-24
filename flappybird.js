@@ -32,8 +32,8 @@ const clouds = [
     {
         "number": 6,
         "src": "./assets/Cloud 6.png",
-        "width": 468,
-        "height": 102
+        "width": 171,
+        "height": 72
     },
     {
         "number": 7,
@@ -50,8 +50,8 @@ const clouds = [
     {
         "number": 9,
         "src": "./assets/Cloud 9.png",
-        "width": 447,
-        "height": 162
+        "width": 204,
+        "height": 90
     },
     {
         "number": 10,
@@ -256,8 +256,8 @@ function moveBird(e) {
 }
 
 function detectCollision(a, b) {
-    return a.x < b.x + b.width &&   //a's top left corner doesn't reach b's top right corner
-           a.x + a.width > b.x &&   //a's top right corner passes b's top left corner
-           a.y < b.y + b.height &&  //a's top left corner doesn't reach b's bottom left corner
-           a.y + a.height > b.y;    //a's bottom left corner passes b's top left corner
+    return a.x < b.x + (b.width - 20) &&   //a's top left corner doesn't reach b's top right corner
+           a.x + (a.width - 30) > b.x &&   //a's top right corner passes b's top left corner
+           a.y - 10 < b.y + (b.height - 20) &&  //a's top left corner doesn't reach b's bottom left corner
+           a.y + (a.height - 20) > b.y;    //a's bottom left corner passes b's top left corner
 }
