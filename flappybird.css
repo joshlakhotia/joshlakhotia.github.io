@@ -6,3 +6,16 @@ body {
 #board {
     /* background-color: skyblue; */
 }
+
+input {
+    position: absolute;
+    top: 200px;
+    left: 400px;
+    width: 100px;
+    height: 50px;
+    font-size: 16px;
+}
+
+.hidden {
+    display: none;
+}

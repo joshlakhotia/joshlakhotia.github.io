@@ -61,6 +61,49 @@ const clouds = [
     }
 ]
 
+let leaderboard = [
+    {
+        name: "Empty",
+        score: 0
+    },
+    {
+        name: "Empty",
+        score: 0
+    },
+    {
+        name: "Empty",
+        score: 0
+    },
+    {
+        name: "Empty",
+        score: 0
+    },
+    {
+        name: "Empty",
+        score: 0
+    },
+    {
+        name: "Empty",
+        score: 0
+    },
+    {
+        name: "Empty",
+        score: 0
+    },
+    {
+        name: "Empty",
+        score: 0
+    },
+    {
+        name: "Empty",
+        score: 0
+    },
+    {
+        name: "Empty",
+        score: 0
+    },
+]
+
 //board
 let board;
 let boardWidth = 1000;
@@ -94,6 +137,7 @@ let pipeY = 0;
 let topPipeImg;
 let bottomPipeImg;
 let menu;
+let endMenuSeen = true;
 
 //physics
 let velocityX = -3; //pipes moving left speed
@@ -205,9 +249,51 @@ function update() {
         context.fillText(score, 5, 45);
 
         if (gameOver) {
-            context.drawImage(menu, 0, 0, 1000, 640);
+            endMenuSeen = false;
+            let leaders = JSON.parse(localStorage.getItem('leaders')) //once code below works
+            console.log(leaders);
+            context.drawImage(menu, 0, 0, 1000, 640); //game over menu
+            context.fillText("Name", 500, 180);
+            context.fillText("Score", 700, 180);
+            if (leaders) {
+                for(let i = 0; i < 9; i++) {
+                    let leaderY = 150 + (45 * i); //leaderboard vertical position
+                    context.fillText(leaders[i].name, 100, leaderY);
+                    context.fillText(leaders[i].score, 900, leaderY);
+                }
+            } else {
+                context.fillText("Its very quiet in here...", 500, 270);
+            }
             context.fillText(score, 5, 45);
             context.fillText("GAME OVER", 5, 90);
+
+            if(leaders && score > leaders[9].score || !leaders) {
+                if(leaders) {
+                    leaders.pop(); //get rid of lowest score in leaderboard
+                } else {
+                    leaders = leaderboard;
+                };
+                const input = document.getElementById("name");
+                input.classList.remove('hidden'); //show name field entry
+
+                document.getElementById('name').addEventListener('keydown', function(event) {
+                    if (event.key === 'Enter') {
+                        const inputValue = this.value; // Get the input value
+                        //this.value = ''; // Clear the input
+                        input.classList.add('hidden'); // hid name field entry after "enter"
+                        leaders.push({name: inputValue, score: score});
+                        leaders.sort((a, b) => b.score - a.score);
+
+                        localStorage.setItem('leaders', JSON.stringify(leaders)); //store leaders in localStorage
+                        endMenuSeen = true;
+                    }
+                });
+            } else {
+                setTimeout(() => {
+                    endMenuSeen = true;
+                }, 5000);
+            }
+
         }
     }
 }
@@ -223,11 +309,9 @@ function placePipes() {
     if (gameStart) {
         let randomPipeY = Math.random()*(640)-50;
         let randomIndex = Math.floor(Math.random() * 10)
-        console.log(randomIndex);
-        let randomCloud = clouds[randomIndex];
+        let randomCloud = clouds[randomIndex]; //pick a random cloud from the clouds array
         const cloudImg = new Image;
         cloudImg.src = randomCloud.src;
-        console.log(randomCloud);
 
         let topPipe = {
             img : cloudImg,
@@ -260,8 +344,9 @@ function moveBird(e) {
 
 
 
-        //reset game
-        if (gameOver) {
+        //reset game    can somehow prevent restart of game too early while scores are displayed here
+
+        if (gameOver && endMenuSeen) {
             velocityX = -3;
             bird.y = birdY;
             pipeArray = [];
