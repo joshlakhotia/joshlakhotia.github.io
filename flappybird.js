@@ -252,7 +252,7 @@ function update() {
             endMenuSeen = false;
             let leaders = JSON.parse(localStorage.getItem('leaders')) //once code below works
             console.log(leaders);
-            context.drawImage(menu, 0, 0, 1000, 640); //game over menu
+            context.drawImage(menu, 0, 0, 1920, 1080); //game over menu
             context.fillText("Name", 500, 180);
             context.fillText("Score", 700, 180);
             if (leaders) {
@@ -307,7 +307,7 @@ function placePipes() {
     // 0 -> -128 (pipeHeight/4)
     // 1 -> -128 - 256 (pipeHeight/4 - pipeHeight/2) = -3/4 pipeHeight
     if (gameStart) {
-        let randomPipeY = Math.random()*(640)-50;
+        let randomPipeY = Math.random()*(1080)-50;
         let randomIndex = Math.floor(Math.random() * 10)
         let randomCloud = clouds[randomIndex]; //pick a random cloud from the clouds array
         const cloudImg = new Image;
