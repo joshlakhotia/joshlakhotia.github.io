@@ -106,8 +106,8 @@ let leaderboard = [
 
 //board
 let board;
-let boardWidth = 1000;
-let boardHeight = 640;
+let boardWidth = 1920;
+let boardHeight = 1080;
 let context;
 
 //backgroundparalax
@@ -158,20 +158,20 @@ window.onload = function() {
     bgImg1 = new Image();
     bgImg1.src = './assets/bg1.png';
     bgImg1.onload = function() {
-        context.drawImage(bgImg1, 0, 0, 1000, 640);
+        context.drawImage(bgImg1, 0, 0, 1920, 1080);
     }
 
     bgImg2 = new Image();
     bgImg2.src = './assets/bg2.png';
     bgImg2.onload = function() {
-        context.drawImage(bgImg2, 0, 0, 1000, 640);
+        context.drawImage(bgImg2, 0, 0, 1920, 1080);
     }
 
     bgImg3 = new Image();
     bgImg3.src = './assets/bg3.png';
     bg3X -= 5;
     bgImg3.onload = function() {
-        context.drawImage(bgImg3, bg3X, 0, 1000, 640);
+        context.drawImage(bgImg3, bg3X, 0, 1920, 1080);
     }
 
     //load images
@@ -181,11 +181,11 @@ window.onload = function() {
     menu = new Image();
     menu.src = "./assets/menu.gif";
     menu.onload = function () {
-        context.drawImage(menu, 0, 0, 1000, 640);
+        context.drawImage(menu, 0, 0, 1920, 1080);
     }
 
     requestAnimationFrame(update);
-    setInterval(placePipes, 750); //every 1 seconds
+    setInterval(placePipes, 1000); //every 1 seconds
     document.addEventListener("keydown", moveBird);
     document.addEventListener("keydown", startGame);
 }
@@ -199,9 +199,9 @@ function update() {
     if (gameStart) {
         context.clearRect(0, 0, board.width, board.height);
 
-        context.drawImage(bgImg1, 0, 0, 1000, 640);
-        context.drawImage(bgImg2, 0, 0, 1000, 640);
-        context.drawImage(bgImg3, 0, 0, 1000, 640);
+        context.drawImage(bgImg1, 0, 0, 1920, 1080);
+        context.drawImage(bgImg2, 0, 0, 1920, 1080);
+        context.drawImage(bgImg3, 0, 0, 1920, 1080);
 
         //bird
         velocityY += gravity/2;
