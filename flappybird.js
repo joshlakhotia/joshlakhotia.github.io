@@ -2,62 +2,62 @@ const clouds = [
     {
         "number": 1,
         "src": "./assets/Cloud 1.png",
-        "width": 294,
-        "height": 114
+        "width": 368,
+        "height": 143
     },
     {
         "number": 2,
         "src": "./assets/Cloud 2.png",
-        "width": 411,
-        "height": 54
+        "width": 514,
+        "height": 67.5
     },
     {
         "number": 3,
         "src": "./assets/Cloud 3.png",
-        "width": 297,
-        "height": 81
+        "width": 371,
+        "height": 101
     },
     {
         "number": 4,
         "src": "./assets/Cloud 4.png",
-        "width": 264,
-        "height": 102
+        "width": 330,
+        "height": 128
     },
     {
         "number": 5,
         "src": "./assets/Cloud 5.png",
-        "width": 258,
-        "height": 147
+        "width": 323,
+        "height": 184
     },
     {
         "number": 6,
         "src": "./assets/Cloud 6.png",
-        "width": 171,
-        "height": 72
+        "width": 214,
+        "height": 90
     },
     {
         "number": 7,
         "src": "./assets/Cloud 7.png",
-        "width": 264,
-        "height": 99
+        "width": 330,
+        "height": 124
     },
     {
         "number": 8,
         "src": "./assets/Cloud 8.png",
-        "width": 258,
+        "width": 323,
         "height": 153
     },
     {
         "number": 9,
         "src": "./assets/Cloud 9.png",
-        "width": 204,
-        "height": 90
+        "width": 255,
+        "height": 113
     },
     {
         "number": 10,
         "src": "./assets/Cloud 10.png",
-        "width": 264,
-        "height": 105
+        "width": 330,
+        "height": 131
     }
 ]
 
@@ -106,16 +106,16 @@ let leaderboard = [
 
 //board
 let board;
-let boardWidth = 1920;
-let boardHeight = 1080;
+let boardWidth = 1420;
+let boardHeight = 789;
 let context;
 
 //backgroundparalax
 let bg3X;
 
 //bird
-let birdWidth = 64; //width/height ratio = 408/228 = 17/12
-let birdHeight = 38;
+let birdWidth = 96; //width/height ratio = 408/228 = 17/12
+let birdHeight = 57;
 let birdX = boardWidth/8;
 let birdY = boardHeight/2;
 let birdImg;
@@ -126,6 +126,8 @@ let bird = {
     width : birdWidth,
     height : birdHeight
 }
+
+//butters wants to be mentioned
 
 //pipes
 let pipeArray = [];
@@ -158,7 +160,7 @@ window.onload = function() {
     bgImg1 = new Image();
     bgImg1.src = './assets/bg1.png';
     bgImg1.onload = function() {
-        context.drawImage(bgImg1, 0, 0, 1920, 1080);
+        context.drawImage(bgImg1, 0, 0, 1420, 789);
     }
 
     bgImg2 = new Image();
@@ -181,7 +183,7 @@ window.onload = function() {
     menu = new Image();
     menu.src = "./assets/menu.gif";
     menu.onload = function () {
-        context.drawImage(menu, 0, 0, 1920, 1080);
+        context.drawImage(menu, 0, 0, 1420, 789);
     }
 
     requestAnimationFrame(update);
@@ -252,7 +254,7 @@ function update() {
             endMenuSeen = false;
             let leaders = JSON.parse(localStorage.getItem('leaders')) //once code below works
             console.log(leaders);
-            context.drawImage(menu, 0, 0, 1920, 1080); //game over menu
+            context.drawImage(menu, 0, 0, 1420, 789); //game over menu
             context.fillText("Name", 500, 180);
             context.fillText("Score", 700, 180);
             if (leaders) {
@@ -307,7 +309,7 @@ function placePipes() {
     // 0 -> -128 (pipeHeight/4)
     // 1 -> -128 - 256 (pipeHeight/4 - pipeHeight/2) = -3/4 pipeHeight
     if (gameStart) {
-        let randomPipeY = Math.random()*(1080)-50;
+        let randomPipeY = Math.random()*(780-50);
         let randomIndex = Math.floor(Math.random() * 10)
         let randomCloud = clouds[randomIndex]; //pick a random cloud from the clouds array
         const cloudImg = new Image;
