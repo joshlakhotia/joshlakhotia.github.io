@@ -2,120 +2,120 @@ const clouds = [
     {
         "number": 1,
         "src": "./assets/Cloud 1.png",
-        "width": 368,
-        "height": 143
+        "width": 184,
+        "height": 72
     },
     {
         "number": 2,
         "src": "./assets/Cloud 2.png",
-        "width": 514,
-        "height": 67.5
+        "width": 257,
+        "height": 34
     },
     {
         "number": 3,
         "src": "./assets/Cloud 3.png",
-        "width": 371,
-        "height": 101
+        "width": 186,
+        "height": 50
     },
     {
         "number": 4,
         "src": "./assets/Cloud 4.png",
-        "width": 330,
-        "height": 128
+        "width": 165,
+        "height": 64
     },
     {
         "number": 5,
         "src": "./assets/Cloud 5.png",
-        "width": 323,
-        "height": 184
+        "width": 162,
+        "height": 92
     },
     {
         "number": 6,
         "src": "./assets/Cloud 6.png",
-        "width": 214,
-        "height": 90
+        "width": 107,
+        "height": 45
     },
     {
         "number": 7,
         "src": "./assets/Cloud 7.png",
-        "width": 330,
-        "height": 124
+        "width": 165,
+        "height": 62
     },
     {
         "number": 8,
         "src": "./assets/Cloud 8.png",
-        "width": 323,
-        "height": 153
+        "width": 162,
+        "height": 77
     },
     {
         "number": 9,
         "src": "./assets/Cloud 9.png",
-        "width": 255,
-        "height": 113
+        "width": 128,
+        "height": 57
     },
     {
         "number": 10,
         "src": "./assets/Cloud 10.png",
-        "width": 330,
-        "height": 131
+        "width": 165,
+        "height": 66
     }
 ]
 
 let leaderboard = [
     {
-        name: "Empty",
+        name: "Could be u",
         score: 0
     },
     {
-        name: "Empty",
+        name: "Could be u",
         score: 0
     },
     {
-        name: "Empty",
+        name: "Could be u",
         score: 0
     },
     {
-        name: "Empty",
+        name: "Could be u",
         score: 0
     },
     {
-        name: "Empty",
+        name: "Could be u",
         score: 0
     },
     {
-        name: "Empty",
+        name: "Could be u",
         score: 0
     },
     {
-        name: "Empty",
+        name: "Could be u",
         score: 0
     },
     {
-        name: "Empty",
+        name: "Could be u",
         score: 0
     },
     {
-        name: "Empty",
+        name: "Could be u",
         score: 0
     },
     {
-        name: "Empty",
+        name: "Could be u",
         score: 0
     },
 ]
 
 //board
 let board;
-let boardWidth = 1420;
-let boardHeight = 789;
+let boardWidth = 800;
+let boardHeight = 400;
 let context;
 
 //backgroundparalax
 let bg3X;
 
 //bird
-let birdWidth = 96; //width/height ratio = 408/228 = 17/12
-let birdHeight = 57;
+let birdWidth = 64; //width/height ratio = 408/228 = 17/12
+let birdHeight = 38;
 let birdX = boardWidth/8;
 let birdY = boardHeight/2;
 let birdImg;
@@ -150,11 +150,23 @@ let gameOver = false;
 let gameStart = false;
 let score = 0;
 
+let leaders = JSON.parse(localStorage.getItem('leaders'))
+
 window.onload = function() {
     board = document.getElementById("board");
     board.height = boardHeight;
     board.width = boardWidth;
     context = board.getContext("2d"); //used for drawing on the board
+
+    highScore = document.getElementById("highscore");
+    highScore.height = 400;
+    highScore.width = 300;
+    context1 = highScore.getContext("2d"); //used for drawing on the board
+
+    //context1.fillStyle = 'gray'; // Set color for the first canvas
+    //context1.fillRect(0, 0, 300, 400)
+
+    drawScores(leaders, context1);
 
     //background
     bgImg1 = new Image();
@@ -181,10 +193,15 @@ window.onload = function() {
     birdImg.src = "./flappysuit1.png";
 
     menu = new Image();
-    menu.src = "./assets/menu.gif";
+    menu.src = "./assets/start.gif";
     menu.onload = function () {
-        context.drawImage(menu, 0, 0, 1420, 789);
+        context.drawImage(menu, 0, 0, 800, 350);
     }
+
+    end = new Image();
+    end.src = "./assets/gameover.png";
+
+    drawScores(leaders, context1);
 
     requestAnimationFrame(update);
     setInterval(placePipes, 1000); //every 1 seconds
@@ -252,20 +269,28 @@ function update() {
 
         if (gameOver) {
             endMenuSeen = false;
-            let leaders = JSON.parse(localStorage.getItem('leaders')) //once code below works
-            console.log(leaders);
-            context.drawImage(menu, 0, 0, 1420, 789); //game over menu
-            context.fillText("Name", 500, 180);
-            context.fillText("Score", 700, 180);
-            if (leaders) {
-                for(let i = 0; i < 9; i++) {
-                    let leaderY = 150 + (45 * i); //leaderboard vertical position
-                    context.fillText(leaders[i].name, 100, leaderY);
-                    context.fillText(leaders[i].score, 900, leaderY);
-                }
-            } else {
-                context.fillText("Its very quiet in here...", 500, 270);
-            }
+            
+            context.drawImage(end, 0, 0, 800, 390); //game over menu
+
+            drawScores(leaders, context1);
+
+            // context1.clearRect(0, 0, highScore.width, highScore.height);
+            
+            // context1.fillStyle = "black"; //color of leaderboard text
+            // context1.font = "30px Ubuntu"
+
+            // context1.fillText("High Score", 50, 50)
+
+            // if (leaders) {
+            //     for(let i = 0; i < 6; i++) {      //how many scores to display in highscore screen
+            //         let leaderY = 125 + (45 * i); //leaderboard vertical position
+            //         context1.fillText(leaders[i].name, 50, leaderY, 145); //(text, x, y, maxwidth)
+            //         context1.fillText(leaders[i].score, 250, leaderY, 50); //(text, x, y, maxwidth)
+            //     }
+            // } else {
+            //     context1.fillText("Its very quiet in here...", 0, 50);
+            // }
+
             context.fillText(score, 5, 45);
             context.fillText("GAME OVER", 5, 90);
 
@@ -278,22 +303,24 @@ function update() {
                 const input = document.getElementById("name");
                 input.classList.remove('hidden'); //show name field entry
 
-                document.getElementById('name').addEventListener('keydown', function(event) {
+                document.getElementById('name').addEventListener('keydown', function eventHandler(event) {
                     if (event.key === 'Enter') {
                         const inputValue = this.value; // Get the input value
-                        //this.value = ''; // Clear the input
-                        input.classList.add('hidden'); // hid name field entry after "enter"
+                        this.value = ''; // Clear the input
+                        input.classList.add('hidden'); // hide name field entry after "enter"
                         leaders.push({name: inputValue, score: score});
                         leaders.sort((a, b) => b.score - a.score);
-
+                        console.log("added to leaderboard");
                         localStorage.setItem('leaders', JSON.stringify(leaders)); //store leaders in localStorage
+                        drawScores(leaders, context1); //update high score board when new high score is entered
                         endMenuSeen = true;
+                        document.getElementById('name').removeEventListener('keydown', eventHandler);
                     }
                 });
             } else {
                 setTimeout(() => {
                     endMenuSeen = true;
-                }, 5000);
+                }, 3000);                   //how long to wait after game over and no high score before they can restart the game (avoids accidentally starting new game without seeing end screen)
             }
 
         }
@@ -309,7 +336,7 @@ function placePipes() {
     // 0 -> -128 (pipeHeight/4)
     // 1 -> -128 - 256 (pipeHeight/4 - pipeHeight/2) = -3/4 pipeHeight
     if (gameStart) {
-        let randomPipeY = Math.random()*(780-50);
+        let randomPipeY = Math.random()*(400-50);
         let randomIndex = Math.floor(Math.random() * 10)
         let randomCloud = clouds[randomIndex]; //pick a random cloud from the clouds array
         const cloudImg = new Image;
@@ -363,4 +390,26 @@ function detectCollision(a, b) {
            a.x + (a.width - 30) > b.x &&   //a's top right corner passes b's top left corner
            a.y - 10 < b.y + (b.height - 20) &&  //a's top left corner doesn't reach b's bottom left corner
            a.y + (a.height - 20) > b.y;    //a's bottom left corner passes b's top left corner
+}
+
+function drawScores(leaders, context1) {
+    context1.clearRect(0, 0, highScore.width, highScore.height);
+
+    context1.fillStyle = "gray";
+    context1.fillRect(0, 0, 300, 400);
+            
+    context1.fillStyle = "white"; //color of leaderboard text
+    context1.font = "30px Ubuntu"
+
+    context1.fillText("HIGH SCORES", 50, 50)
+
+    if (leaders) {
+        for(let i = 0; i < 6; i++) {      //how many scores to display in highscore screen
+            let leaderY = 125 + (45 * i); //leaderboard vertical position
+            context1.fillText(leaders[i].name, 20, leaderY); //(text, x, y, maxwidth)
+            context1.fillText(leaders[i].score, 240, leaderY, 50); //(text, x, y, maxwidth)
+        }
+    } else {
+        context1.fillText("Its very quiet in here...", 20, 150);
+    }
 }

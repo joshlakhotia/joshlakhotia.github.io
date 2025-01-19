@@ -1,17 +1,71 @@
 body {
     font-family:'Courier New', Courier, monospace;
     text-align: center;
+    height: 100vh;
+    margin:0;
+    background: linear-gradient(to bottom, #C41230, #662D91);
+    display: flex;
+    justify-content: flex-start; /* Center horizontally */
+    align-items: center;     /* Center vertically */
+}
+
+#left {
+    display: flex;
+    flex-direction: column; /* Stack elements vertically */
+    justify-content: flex-end; /* Align items to the bottom */
+    height: 100vh;
+    width: 20%;
+}
+
+#center {
+    display: flex;
+    flex-direction: column; /* Stack elements vertically */
+    justify-content: flex-end; /* Align items to the bottom */
+    align-items: center;
+}
+
+#right {
+    display: flex;
+    align-items: center;
+    height: 100vh;
+    width: 20%;
+    margin-top: 1%;
+    margin-left: 1%;
 }
 
 #board {
     /* background-color: skyblue; */
+    border: 3px solid #000;
+}
+
+#helmut {
+    margin-bottom: 0;
+    max-width: 100%;
+}
+
+#cypres {
+    display: block;
+    height: 100px;
+    margin-top: 0px;
+    margin-bottom: 15px;
+}
+
+#ssk {
+    display: block;
+    height: 50px;
+    margin-top: 25px;
+    margin-bottom: 25px;
+}
+
+#score {
+    margin: auto;
 }
 
 input {
     position: absolute;
-    top: 200px;
-    left: 400px;
-    width: 100px;
+    top: 47%;
+    left: 23%;
+    width: 200px;
     height: 50px;
     font-size: 16px;
 }
