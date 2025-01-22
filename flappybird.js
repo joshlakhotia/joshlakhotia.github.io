@@ -109,6 +109,7 @@ let board;
 let boardWidth = 800;
 let boardHeight = 400;
 let context;
+let context1;
 
 //backgroundparalax
 let bg3X;
@@ -193,7 +194,7 @@ window.onload = function() {
     birdImg.src = "./flappysuit1.png";
 
     menu = new Image();
-    menu.src = "./assets/start.gif";
+    menu.src = "./assets/start.png";
     menu.onload = function () {
         context.drawImage(menu, 0, 0, 800, 350);
     }
@@ -227,9 +228,14 @@ function update() {
         // bird.y += velocityY;
         bird.y = Math.max(bird.y + velocityY, 0); //apply gravity to current bird.y, limit the bird.y to top of the canvas
         if( velocityY <= 0) {
+            birdImg.src = "./flappysuit3.png";
+            bird.height = birdHeight;
+        } else if (velocityY <= 1) {
             birdImg.src = "./flappysuit2.png";
+            bird.height = birdHeight;
         } else {
             birdImg.src = "./flappysuit1.png";
+            bird.height = 25;
         }
         context.drawImage(birdImg, bird.x, bird.y, bird.width, bird.height);
 
@@ -292,7 +298,6 @@ function update() {
             // }
 
             context.fillText(score, 5, 45);
-            context.fillText("GAME OVER", 5, 90);
 
             if(leaders && score > leaders[9].score || !leaders) {
                 if(leaders) {
@@ -315,11 +320,17 @@ function update() {
                         drawScores(leaders, context1); //update high score board when new high score is entered
                         endMenuSeen = true;
                         document.getElementById('name').removeEventListener('keydown', eventHandler);
+                        context.fillStyle = '#a7bfed';            //redraws start menu screen after entering high score
+                        context.fillRect(0,0, 800, 400);          
+                        context.drawImage(menu, 0, 0, 800, 350);
                     }
                 });
             } else {
                 setTimeout(() => {
-                    endMenuSeen = true;
+                    endMenuSeen = true;              //this block sets a timer after game over and redraws the start menu screen
+                    context.fillStyle = '#a7bfed';
+                    context.fillRect(0,0, 800, 400);
+                    context.drawImage(menu, 0, 0, 800, 350);
                 }, 3000);                   //how long to wait after game over and no high score before they can restart the game (avoids accidentally starting new game without seeing end screen)
             }
 
@@ -387,8 +398,8 @@ function moveBird(e) {
 
 function detectCollision(a, b) {
     return a.x < b.x + (b.width - 20) &&   //a's top left corner doesn't reach b's top right corner
-           a.x + (a.width - 30) > b.x &&   //a's top right corner passes b's top left corner
-           a.y - 10 < b.y + (b.height - 20) &&  //a's top left corner doesn't reach b's bottom left corner
+           a.x + (a.width - 15) > b.x &&   //a's top right corner passes b's top left corner
+           a.y - 10 < b.y + (b.height - 30) &&  //a's top left corner doesn't reach b's bottom left corner
            a.y + (a.height - 20) > b.y;    //a's bottom left corner passes b's top left corner
 }
 
@@ -399,9 +410,9 @@ function drawScores(leaders, context1) {
     context1.fillRect(0, 0, 300, 400);
             
     context1.fillStyle = "white"; //color of leaderboard text
-    context1.font = "30px Ubuntu"
+    context1.font = "25px Ubuntu"
 
-    context1.fillText("HIGH SCORES", 50, 50)
+    context1.fillText("HIGH SCORES", 65, 50)
 
     if (leaders) {
         for(let i = 0; i < 6; i++) {      //how many scores to display in highscore screen
