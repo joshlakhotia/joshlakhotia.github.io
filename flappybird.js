@@ -143,15 +143,23 @@ let menu;
 let endMenuSeen = true;
 
 //physics
-let velocityX = -3; //pipes moving left speed
+let velocityX = -4; //pipes moving left speed
 let velocityY = 0; //bird jump speed
-let gravity = 0.2;
+let gravity = 0.15;
 
 let gameOver = false;
 let gameStart = false;
 let score = 0;
 
-let leaders = JSON.parse(localStorage.getItem('leaders'))
+//music
+const menuMusic = new Audio('./assets/menumusic.mp3');
+menuMusic.loop = true;  // Loop the music
+menuMusic.volume = 0.3;
+
+const gameMusic = new Audio('./assets/gameplaymusic.mp3');
+gameMusic.loop = true; //Loop the music
+
+let leaders = JSON.parse(localStorage.getItem('leaders'));
 
 window.onload = function() {
     board = document.getElementById("board");
@@ -202,12 +210,18 @@ window.onload = function() {
     end = new Image();
     end.src = "./assets/gameover.png";
 
+    gameOverHigh = new Image();
+    gameOverHigh.src = "./assets/Highscore.png";
+
     drawScores(leaders, context1);
 
     requestAnimationFrame(update);
-    setInterval(placePipes, 1000); //every 1 seconds
+    setInterval(placePipes, 500); //every 1 seconds
     document.addEventListener("keydown", moveBird);
     document.addEventListener("keydown", startGame);
+
+    //play menu music
+    menuMusic.play();
 }
 
 function update() {
@@ -217,6 +231,11 @@ function update() {
     }
 
     if (gameStart) {
+        //stop menu music and play game music
+        menuMusic.pause();
+        menuMusic.currentTime = 0; //set menu music to beginning
+        gameMusic.play();
+
         context.clearRect(0, 0, board.width, board.height);
 
         context.drawImage(bgImg1, 0, 0, 1920, 1080);
@@ -275,6 +294,10 @@ function update() {
 
         if (gameOver) {
             endMenuSeen = false;
+
+            gameMusic.pause();
+            gameMusic.currentTime = 0; //set game music to beginning
+            menuMusic.play();
             
             context.drawImage(end, 0, 0, 800, 390); //game over menu
 
@@ -300,6 +323,12 @@ function update() {
             context.fillText(score, 5, 45);
 
             if(leaders && score > leaders[9].score || !leaders) {
+                context.clearRect(0, 0, board.width, board.height);
+                context.fillStyle = '#a7bfed';
+                context.fillRect(0,0, 800, 400);
+                context.drawImage(gameOverHigh, 0, 0, 800, 390);
+                context.fillStyle = 'white'
+                context.fillText(score, 5, 45);
                 if(leaders) {
                     leaders.pop(); //get rid of lowest score in leaderboard
                 } else {
@@ -307,6 +336,7 @@ function update() {
                 };
                 const input = document.getElementById("name");
                 input.classList.remove('hidden'); //show name field entry
+                document.getElementById("name").focus();
 
                 document.getElementById('name').addEventListener('keydown', function eventHandler(event) {
                     if (event.key === 'Enter') {
@@ -367,7 +397,7 @@ function placePipes() {
 }
 
 function startGame(e) {
-    if(e.code == "Space") {
+    if(e.code == "ArrowUp") {
         gameStart = true;
     }
 }
@@ -377,7 +407,7 @@ function endGame() {
 }
 
 function moveBird(e) {
-    if (e.code == "Space" || e.code == "ArrowUp" || e.code == "KeyX") {
+    if (e.code == "ArrowUp") {
         //jump
         velocityY = -3;
 
