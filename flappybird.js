@@ -1,108 +1,7 @@
-const clouds = [
-    {
-        "number": 1,
-        "src": "./assets/Cloud 1.png",
-        "width": 184,
-        "height": 72
-    },
-    {
-        "number": 2,
-        "src": "./assets/Cloud 2.png",
-        "width": 257,
-        "height": 34
-    },
-    {
-        "number": 3,
-        "src": "./assets/Cloud 3.png",
-        "width": 186,
-        "height": 50
-    },
-    {
-        "number": 4,
-        "src": "./assets/Cloud 4.png",
-        "width": 165,
-        "height": 64
-    },
-    {
-        "number": 5,
-        "src": "./assets/Cloud 5.png",
-        "width": 162,
-        "height": 92
-    },
-    {
-        "number": 6,
-        "src": "./assets/Cloud 6.png",
-        "width": 107,
-        "height": 45
-    },
-    {
-        "number": 7,
-        "src": "./assets/Cloud 7.png",
-        "width": 165,
-        "height": 62
-    },
-    {
-        "number": 8,
-        "src": "./assets/Cloud 8.png",
-        "width": 162,
-        "height": 77
-    },
-    {
-        "number": 9,
-        "src": "./assets/Cloud 9.png",
-        "width": 128,
-        "height": 57
-    },
-    {
-        "number": 10,
-        "src": "./assets/Cloud 10.png",
-        "width": 165,
-        "height": 66
-    }
-]
-
-let leaderboard = [
-    {
-        name: "Could be u",
-        score: 0
-    },
-    {
-        name: "Could be u",
-        score: 0
-    },
-    {
-        name: "Could be u",
-        score: 0
-    },
-    {
-        name: "Could be u",
-        score: 0
-    },
-    {
-        name: "Could be u",
-        score: 0
-    },
-    {
-        name: "Could be u",
-        score: 0
-    },
-    {
-        name: "Could be u",
-        score: 0
-    },
-    {
-        name: "Could be u",
-        score: 0
-    },
-    {
-        name: "Could be u",
-        score: 0
-    },
-    {
-        name: "Could be u",
-        score: 0
-    },
-]
+import { playGameMusic, playMenuMusic, pauseGameMusic } from './music.js';
+import { detectCollision } from './utils.js';
+import { clouds, initializeBackground, drawBackground, drawBackgroundOnLoad } from './background.js';
+import { drawScores, leaderboard } from './leaderboard.js';
 
 //board
 let board;
@@ -110,9 +9,12 @@ let boardWidth = 800;
 let boardHeight = 400;
 let context;
 let context1;
+let highScore;
 
-//backgroundparalax
-let bg3X;
+
+//background
+let gameOverHigh;
+let end;
 
 //bird
 let birdWidth = 64; //width/height ratio = 408/228 = 17/12
@@ -133,33 +35,23 @@ let bird = {
 //pipes
 let pipeArray = [];
 let pipeWidth = 352; //width/height ratio = 384/3072 = 1/8
-let pipeHeight = 132; //original is 512
 let pipeX = boardWidth;
-let pipeY = 0;
 
-let topPipeImg;
-let bottomPipeImg;
 let menu;
 let endMenuSeen = true;
 
 //physics
 let velocityX = -4; //pipes moving left speed
-let velocityY = 0; //bird jump speed
-let gravity = 0.15;
+let velocityY = 100; //bird jump speed
+let gravity = 0.2;
 
 let gameOver = false;
 let gameStart = false;
 let score = 0;
 
-//music
-const menuMusic = new Audio('./assets/menumusic.mp3');
-menuMusic.loop = true;  // Loop the music
-menuMusic.volume = 0.3;
-
-const gameMusic = new Audio('./assets/gameplaymusic.mp3');
-gameMusic.loop = true; //Loop the music
-
 let leaders = JSON.parse(localStorage.getItem('leaders'));
+
+let lastPipeTime = 0;
 
 window.onload = function() {
     board = document.getElementById("board");
@@ -172,30 +64,10 @@ window.onload = function() {
     highScore.width = 300;
     context1 = highScore.getContext("2d"); //used for drawing on the board
 
-    //context1.fillStyle = 'gray'; // Set color for the first canvas
-    //context1.fillRect(0, 0, 300, 400)
+    drawScores(leaders, context1, highScore);
 
-    drawScores(leaders, context1);
-
-    //background
-    bgImg1 = new Image();
-    bgImg1.src = './assets/bg1.png';
-    bgImg1.onload = function() {
-        context.drawImage(bgImg1, 0, 0, 1420, 789);
-    }
-
-    bgImg2 = new Image();
-    bgImg2.src = './assets/bg2.png';
-    bgImg2.onload = function() {
-        context.drawImage(bgImg2, 0, 0, 1920, 1080);
-    }
-
-    bgImg3 = new Image();
-    bgImg3.src = './assets/bg3.png';
-    bg3X -= 5;
-    bgImg3.onload = function() {
-        context.drawImage(bgImg3, bg3X, 0, 1920, 1080);
-    }
+    initializeBackground();
+    drawBackgroundOnLoad(context);
 
     //load images
     birdImg = new Image();
@@ -213,18 +85,17 @@ window.onload = function() {
     gameOverHigh = new Image();
     gameOverHigh.src = "./assets/Highscore.png";
 
-    drawScores(leaders, context1);
+    drawScores(leaders, context1, highScore);
 
     requestAnimationFrame(update);
-    setInterval(placePipes, 500); //every 1 seconds
+    //setInterval(placePipes, 500); //every .5 seconds
     document.addEventListener("keydown", moveBird);
     document.addEventListener("keydown", startGame);
 
-    //play menu music
-    menuMusic.play();
+    playMenuMusic();
 }
 
-function update() {
+function update(timestamp) {
     requestAnimationFrame(update);
     if (gameOver) {
         return;
@@ -232,15 +103,10 @@ function update() {
 
     if (gameStart) {
         //stop menu music and play game music
-        menuMusic.pause();
-        menuMusic.currentTime = 0; //set menu music to beginning
-        gameMusic.play();
+        playGameMusic();
 
         context.clearRect(0, 0, board.width, board.height);
-
-        context.drawImage(bgImg1, 0, 0, 1920, 1080);
-        context.drawImage(bgImg2, 0, 0, 1920, 1080);
-        context.drawImage(bgImg3, 0, 0, 1920, 1080);
+        drawBackground(context);
 
         //bird
         velocityY += gravity/2;
@@ -262,10 +128,6 @@ function update() {
             gameOver = true;
         }
 
-        // if (score > 5) {       //If score is increasing, increase velocity of clouds. Only implement if clound intervals can become dynamic
-        //     velocityX = -5;
-        // }
-
         //pipes
         for (let i = 0; i < pipeArray.length; i++) {
             let pipe = pipeArray[i];
@@ -273,7 +135,7 @@ function update() {
             context.drawImage(pipe.img, pipe.x, pipe.y, pipe.width, pipe.height);
 
             if (!pipe.passed && bird.x > pipe.x + pipe.width) {
-                score += 1; //0.5 because there are 2 pipes! so 0.5*2 = 1, 1 for each set of pipes
+                score += 1;
                 pipe.passed = true;
             }
 
@@ -287,6 +149,12 @@ function update() {
             pipeArray.shift(); //removes first element from the array
         }
 
+        //place pipes every 500ms
+        if (timestamp - lastPipeTime > 750) {
+            placePipes();
+            lastPipeTime = timestamp;
+        }
+
         //score
         context.fillStyle = "white";
         context.font="45px sans-serif";
@@ -295,30 +163,13 @@ function update() {
         if (gameOver) {
             endMenuSeen = false;
 
-            gameMusic.pause();
-            gameMusic.currentTime = 0; //set game music to beginning
-            menuMusic.play();
+            //stop game music and play menu music
+            pauseGameMusic();
+            playMenuMusic();
             
             context.drawImage(end, 0, 0, 800, 390); //game over menu
 
-            drawScores(leaders, context1);
-
-            // context1.clearRect(0, 0, highScore.width, highScore.height);
-            
-            // context1.fillStyle = "black"; //color of leaderboard text
-            // context1.font = "30px Ubuntu"
-
-            // context1.fillText("High Score", 50, 50)
-
-            // if (leaders) {
-            //     for(let i = 0; i < 6; i++) {      //how many scores to display in highscore screen
-            //         let leaderY = 125 + (45 * i); //leaderboard vertical position
-            //         context1.fillText(leaders[i].name, 50, leaderY, 145); //(text, x, y, maxwidth)
-            //         context1.fillText(leaders[i].score, 250, leaderY, 50); //(text, x, y, maxwidth)
-            //     }
-            // } else {
-            //     context1.fillText("Its very quiet in here...", 0, 50);
-            // }
+            drawScores(leaders, context1, highScore); //draw high score board
 
             context.fillText(score, 5, 45);
 
@@ -345,9 +196,8 @@ function update() {
                         input.classList.add('hidden'); // hide name field entry after "enter"
                         leaders.push({name: inputValue, score: score});
                         leaders.sort((a, b) => b.score - a.score);
-                        console.log("added to leaderboard");
                         localStorage.setItem('leaders', JSON.stringify(leaders)); //store leaders in localStorage
-                        drawScores(leaders, context1); //update high score board when new high score is entered
+                        drawScores(leaders, context1, highScore); //update high score board when new high score is entered
                         endMenuSeen = true;
                         document.getElementById('name').removeEventListener('keydown', eventHandler);
                         context.fillStyle = '#a7bfed';            //redraws start menu screen after entering high score
@@ -373,9 +223,6 @@ function placePipes() {
         return;
     }
 
-    //(0-1) * pipeHeight/2.
-    // 0 -> -128 (pipeHeight/4)
-    // 1 -> -128 - 256 (pipeHeight/4 - pipeHeight/2) = -3/4 pipeHeight
     if (gameStart) {
         let randomPipeY = Math.random()*(400-50);
         let randomIndex = Math.floor(Math.random() * 10)
@@ -402,17 +249,10 @@ function startGame(e) {
     }
 }
 
-function endGame() {
-    gameStart = false;
-}
-
 function moveBird(e) {
     if (e.code == "ArrowUp") {
         //jump
         velocityY = -3;
-
-
-
 
         //reset game    can somehow prevent restart of game too early while scores are displayed here
 
@@ -423,34 +263,5 @@ function moveBird(e) {
             score = 0;
             gameOver = false;
         }
-    }
-}
-
-function detectCollision(a, b) {
-    return a.x < b.x + (b.width - 20) &&   //a's top left corner doesn't reach b's top right corner
-           a.x + (a.width - 15) > b.x &&   //a's top right corner passes b's top left corner
-           a.y - 10 < b.y + (b.height - 30) &&  //a's top left corner doesn't reach b's bottom left corner
-           a.y + (a.height - 20) > b.y;    //a's bottom left corner passes b's top left corner
-}
-
-function drawScores(leaders, context1) {
-    context1.clearRect(0, 0, highScore.width, highScore.height);
-
-    context1.fillStyle = "gray";
-    context1.fillRect(0, 0, 300, 400);
-            
-    context1.fillStyle = "white"; //color of leaderboard text
-    context1.font = "25px Ubuntu"
-
-    context1.fillText("HIGH SCORES", 65, 50)
-
-    if (leaders) {
-        for(let i = 0; i < 6; i++) {      //how many scores to display in highscore screen
-            let leaderY = 125 + (45 * i); //leaderboard vertical position
-            context1.fillText(leaders[i].name, 20, leaderY); //(text, x, y, maxwidth)
-            context1.fillText(leaders[i].score, 240, leaderY, 50); //(text, x, y, maxwidth)
-        }
-    } else {
-        context1.fillText("Its very quiet in here...", 20, 150);
     }
 }
